@@ -1,0 +1,6 @@
+uvicorn backend.main:app --reload
+python -m frontend.main
+
+
+
+pip freeze > requirements.txt
