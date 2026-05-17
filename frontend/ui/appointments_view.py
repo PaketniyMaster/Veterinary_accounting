@@ -236,8 +236,17 @@ class AppointmentsView(QWidget):
 
     def load_schedule(self):
         self.doctors = APIClient.get_doctors()
-        if not self.doctors: return
+        
+        # 1. Если врачей нет вообще (все удалены), очищаем таблицу и выходим
+        if not self.doctors: 
+            self.table.setColumnCount(0)
+            self.table.clearContents()
+            return
 
+        # 2. ПРИНУДИТЕЛЬНЫЙ СБРОС КОЛОНОК (Это заставит PyQt6 удалить старые данные)
+        self.table.setColumnCount(0)
+
+        # 3. Строим новую сетку с актуальным количеством врачей
         self.table.setColumnCount(len(self.doctors))
         self.table.setRowCount(len(self.time_slots))
         self.table.setHorizontalHeaderLabels([d['full_name'] for d in self.doctors])
@@ -292,7 +301,6 @@ class AppointmentsView(QWidget):
                 item.setData(Qt.ItemDataRole.UserRole, appt['id'])
                 
                 self.table.setItem(row, col, item)
-
     def handle_cell_click(self, row, col):
         existing_item = self.table.item(row, col)
 

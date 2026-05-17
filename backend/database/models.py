@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Date, DateTime, ForeignKey, Text
+from sqlalchemy import Column, Integer, String, Date, DateTime, ForeignKey, Text, Boolean
 from sqlalchemy.orm import relationship
 from backend.database.connection import Base
 class Client(Base):
@@ -42,12 +42,15 @@ class Doctor(Base):
     id = Column(Integer, primary_key=True, index=True)
     full_name = Column(String(150), nullable=False)
     specialization = Column(String(100))
+    
+    # --- НОВАЯ КОЛОНКА ДЛЯ АРХИВАЦИИ ---
+    is_active = Column(Boolean, default=True)
 
     # Связь с приемами
     appointments = relationship("Appointment", back_populates="doctor")
 
     def __repr__(self):
-        return f"<Doctor(id={self.id}, name='{self.full_name}')>"
+        return f"<Doctor(id={self.id}, name='{self.full_name}', active={self.is_active})>"
 
 class Appointment(Base):
     """Модель Расписания / Записей на прием"""

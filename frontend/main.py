@@ -103,9 +103,20 @@ class MainWindow(QMainWindow):
 
     def switch_page(self, index, active_button):
         self.stacked_widget.setCurrentIndex(index)
-        for btn in [self.btn_dashboard, self.btn_clients, self.btn_doctors, self.btn_appointments]: # Добавили btn_doctors
+        for btn in [self.btn_dashboard, self.btn_clients, self.btn_doctors, self.btn_appointments]: 
             btn.setChecked(False)
         active_button.setChecked(True)
+
+        # --- НОВОЕ: Автоматическое обновление данных при переходе ---
+        try:
+            if index == 0:
+                # Обновляем Дашборд (индекс 0)
+                self.dashboard_page.load_data()
+            elif index == 3:
+                # Обновляем Расписание (индекс 3)
+                self.appointments_page.load_schedule()
+        except Exception as e:
+            print(f"Ошибка при автообновлении вкладки: {e}")
 
     def create_page_stub(self, title_text):
         page = QWidget()

@@ -93,10 +93,20 @@ class APIClient:
         try:
             response = requests.delete(f"{BASE_URL}/doctors/{doctor_id}")
             response.raise_for_status()
-            return True
+            return True, "Врач успешно удален" # Возвращаем статус и сообщение успеха
+        except requests.exceptions.HTTPError as e:
+            # Если сервер вернул ошибку (например, наши 400 Bad Request)
+            if e.response is not None and e.response.status_code == 400:
+                try:
+                    # Вытаскиваем сообщение "detail", которое мы написали в роутере на бэкенде
+                    error_msg = e.response.json().get("detail", "Не удалось удалить врача.")
+                    return False, error_msg
+                except Exception:
+                    pass
+            return False, f"Ошибка сервера: {e}"
         except requests.exceptions.RequestException as e:
             print(f"Ошибка при удалении врача: {e}")
-            return False
+            return False, "Ошибка подключения к серверу"
     
     @staticmethod
     def get_pets():

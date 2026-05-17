@@ -10,6 +10,7 @@ class DoctorCreate(DoctorBase):
 
 class DoctorResponse(DoctorBase):
     id: int
+    is_active: bool # <--- Добавили поле статуса
 
     class Config:
         from_attributes = True

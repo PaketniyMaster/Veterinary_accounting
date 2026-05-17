@@ -42,7 +42,7 @@ class DoctorsView(QWidget):
         # Верхняя панель
         header_layout = QHBoxLayout()
         title = QLabel("Список врачей")
-        title.setStyleSheet("font-size: 20px; font-weight: bold;") # Оставляем только размер
+        title.setStyleSheet("font-size: 20px; font-weight: bold;") 
         
         del_btn = QPushButton(" Удалить")
         del_btn.setCursor(Qt.CursorShape.PointingHandCursor)
@@ -112,14 +112,18 @@ class DoctorsView(QWidget):
         doc_name = self.table.item(row, 1).text()
 
         msg = QMessageBox(self)
-        msg.setWindowTitle("Удаление")
-        msg.setText(f"Удалить врача '{doc_name}'?")
+        msg.setWindowTitle("Подтверждение архивации")
+        msg.setText(f"Перевести врача '{doc_name}' в архив?\n\n(Врач исчезнет из интерфейса, но старые записи останутся)")
         msg.setIcon(QMessageBox.Icon.Question)
         msg.setStandardButtons(QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
         
         if msg.exec() == QMessageBox.StandardButton.Yes:
-            if APIClient.delete_doctor(doc_id):
-                self.load_data()
-                self.show_message("Успех", "Врач удален.")
+            # ТЕПЕРЬ ОЖИДАЕМ ДВА ЗНАЧЕНИЯ ОТ APIClient (статус и сообщение)
+            success, message = APIClient.delete_doctor(doc_id)
+            
+            if success:
+                self.load_data() # Обновляем таблицу только при успехе!
+                self.show_message("Успех", message)
             else:
-                self.show_message("Ошибка", "Не удалось удалить врача.", QMessageBox.Icon.Critical)
+                # Если бэкенд не разрешил удаление, строка в таблице останется на месте
+                self.show_message("Ошибка удаления", message, QMessageBox.Icon.Critical)
